@@ -20,16 +20,18 @@ require Exporter;
 		LOG_LOCAL0 LOG_LOCAL1 LOG_LOCAL2 LOG_LOCAL3
 		LOG_LOCAL4 LOG_LOCAL5 LOG_LOCAL6 LOG_LOCAL7);
 
-%EXPORT_TAGS = ("levels"     => [qw(LOG_EMERG LOG_ALERT LOG_CRIT LOG_ERR
+%EXPORT_TAGS = ('levels'     => [qw(LOG_EMERG LOG_ALERT LOG_CRIT LOG_ERR
 			            LOG_WARNING LOG_NOTICE LOG_INFO LOG_DEBUG  )],
-		"options"    => [qw(LOG_CONS LOG_NDELAY LOG_PERROR LOG_PID     )],
-		"facilities" => [qw(LOG_AUTH LOG_CRON LOG_DAEMON
+		'options'    => [qw(LOG_CONS LOG_NDELAY LOG_PERROR LOG_PID     )],
+		'facilities' => [qw(LOG_AUTH LOG_CRON LOG_DAEMON
 				    LOG_KERN LOG_LPR LOG_MAIL LOG_NEWS
 				    LOG_SECURITY LOG_SYSLOG LOG_USER LOG_UUCP
 				    LOG_LOCAL0 LOG_LOCAL1 LOG_LOCAL2 LOG_LOCAL3
 				    LOG_LOCAL4 LOG_LOCAL5 LOG_LOCAL6 LOG_LOCAL7)]);
 
-$VERSION = '0.03';
+$VERSION = '0.04';
+
+use Carp;
 
 my @LogLevels     = ();
 my %LogOptions    = ();
@@ -46,31 +48,31 @@ sub LOG_INFO()    { return 6; };
 sub LOG_DEBUG()   { return 7; };
 
 # Define log options
-sub LOG_CONS()   { return $LogOptions{"LOG_CONS"}; };
-sub LOG_NDELAY() { return $LogOptions{"LOG_NDELAY"}; };
-sub LOG_PID()    { return $LogOptions{"LOG_PID"}; };
+sub LOG_CONS()   { return $LogOptions{'LOG_CONS'}; };
+sub LOG_NDELAY() { return $LogOptions{'LOG_NDELAY'}; };
+sub LOG_PID()    { return $LogOptions{'LOG_PID'}; };
 
-# Define log facilites
-sub LOG_AUTH()     { return $LogFacilities{"LOG_AUTH"}; };
-sub LOG_AUTHPRIV() { return $LogFacilities{"LOG_AUTHPRIV"}; };
-sub LOG_CRON()     { return $LogFacilities{"LOG_CRON"}; };
-sub LOG_DAEMON()   { return $LogFacilities{"LOG_DAEMON"}; };
-sub LOG_FTP()      { return $LogFacilities{"LOG_FTP"}; };
-sub LOG_KERN()     { return $LogFacilities{"LOG_KERN"}; };
-sub LOG_LPR()      { return $LogFacilities{"LOG_LPR"}; };
-sub LOG_MAIL()     { return $LogFacilities{"LOG_MAIL"}; };
-sub LOG_NEWS()     { return $LogFacilities{"LOG_NEWS"}; };
-sub LOG_SYSLOG()   { return $LogFacilities{"LOG_SYSLOG"}; };
-sub LOG_USER()     { return $LogFacilities{"LOG_USER"}; };
-sub LOG_UUCP()     { return $LogFacilities{"LOG_UUCP"}; };
-sub LOG_LOCAL0()   { return $LogFacilities{"LOG_LOCAL0"}; };
-sub LOG_LOCAL1()   { return $LogFacilities{"LOG_LOCAL1"}; };
-sub LOG_LOCAL2()   { return $LogFacilities{"LOG_LOCAL2"}; };
-sub LOG_LOCAL3()   { return $LogFacilities{"LOG_LOCAL3"}; };
-sub LOG_LOCAL4()   { return $LogFacilities{"LOG_LOCAL4"}; };
-sub LOG_LOCAL5()   { return $LogFacilities{"LOG_LOCAL5"}; };
-sub LOG_LOCAL6()   { return $LogFacilities{"LOG_LOCAL6"}; };
-sub LOG_LOCAL7()   { return $LogFacilities{"LOG_LOCAL7"}; };
+# Define log facilities
+sub LOG_AUTH()     { return $LogFacilities{'LOG_AUTH'}; };
+sub LOG_AUTHPRIV() { return $LogFacilities{'LOG_AUTHPRIV'}; };
+sub LOG_CRON()     { return $LogFacilities{'LOG_CRON'}; };
+sub LOG_DAEMON()   { return $LogFacilities{'LOG_DAEMON'}; };
+sub LOG_FTP()      { return $LogFacilities{'LOG_FTP'}; };
+sub LOG_KERN()     { return $LogFacilities{'LOG_KERN'}; };
+sub LOG_LPR()      { return $LogFacilities{'LOG_LPR'}; };
+sub LOG_MAIL()     { return $LogFacilities{'LOG_MAIL'}; };
+sub LOG_NEWS()     { return $LogFacilities{'LOG_NEWS'}; };
+sub LOG_SYSLOG()   { return $LogFacilities{'LOG_SYSLOG'}; };
+sub LOG_USER()     { return $LogFacilities{'LOG_USER'}; };
+sub LOG_UUCP()     { return $LogFacilities{'LOG_UUCP'}; };
+sub LOG_LOCAL0()   { return $LogFacilities{'LOG_LOCAL0'}; };
+sub LOG_LOCAL1()   { return $LogFacilities{'LOG_LOCAL1'}; };
+sub LOG_LOCAL2()   { return $LogFacilities{'LOG_LOCAL2'}; };
+sub LOG_LOCAL3()   { return $LogFacilities{'LOG_LOCAL3'}; };
+sub LOG_LOCAL4()   { return $LogFacilities{'LOG_LOCAL4'}; };
+sub LOG_LOCAL5()   { return $LogFacilities{'LOG_LOCAL5'}; };
+sub LOG_LOCAL6()   { return $LogFacilities{'LOG_LOCAL6'}; };
+sub LOG_LOCAL7()   { return $LogFacilities{'LOG_LOCAL7'}; };
 
 my $OpenLog  = undef;
 my $CloseLog = undef;
@@ -83,10 +85,11 @@ if ( "\L$^O" =~ m/win32/ )
                 $CloseLog = sub { $_[0]->{Handler}->Close(); };
                 $PutMsg   = sub { $_[0]->{Handler}->Report({EventType => $_[1],
                 					    Strings   => $_[2],
-                					    Category  => 0,
+                					    Category  => $_[0]->{Facility},
                 					    EventID   => 0,
-                					    Data      => ""
-                					  });
+                					    Data      => "",
+                					   }
+                					  );
 				};
 		$LogLevels[LOG_EMERG]   = EVENTLOG_ERROR_TYPE;
 		$LogLevels[LOG_ALERT]   = EVENTLOG_ERROR_TYPE;
@@ -102,40 +105,37 @@ if ( "\L$^O" =~ m/win32/ )
 		$LogOptions{"LOG_NDELAY"} = 0;
 		$LogOptions{"LOG_PID"}    = 0;
 		#
-		# Set log facilites
-		$LogFacilities{"LOG_AUTH"}     = 0;
-		$LogFacilities{"LOG_CRON"}     = 0;
-		$LogFacilities{"LOG_DAEMON"}   = 0;
-		$LogFacilities{"LOG_KERN"}     = 0;
-		$LogFacilities{"LOG_LPR"}      = 0;
-		$LogFacilities{"LOG_MAIL"}     = 0;
-		$LogFacilities{"LOG_NEWS"}     = 0;
-		$LogFacilities{"LOG_SYSLOG"}   = 0;
-		$LogFacilities{"LOG_USER"}     = 0;
-		$LogFacilities{"LOG_UUCP"}     = 0;
-		$LogFacilities{"LOG_LOCAL0"}   = 0;
-		$LogFacilities{"LOG_LOCAL1"}   = 0;
-		$LogFacilities{"LOG_LOCAL2"}   = 0;
-		$LogFacilities{"LOG_LOCAL3"}   = 0;
-		$LogFacilities{"LOG_LOCAL4"}   = 0;
-		$LogFacilities{"LOG_LOCAL5"}   = 0;
-		$LogFacilities{"LOG_LOCAL6"}   = 0;
-		$LogFacilities{"LOG_LOCAL7"}   = 0;
+		# Set log facilities
+		$LogFacilities{"LOG_AUTH"}     =  1;
+		$LogFacilities{"LOG_CRON"}     =  2;
+		$LogFacilities{"LOG_DAEMON"}   =  3;
+		$LogFacilities{"LOG_KERN"}     =  4;
+		$LogFacilities{"LOG_LPR"}      =  5;
+		$LogFacilities{"LOG_MAIL"}     =  6;
+		$LogFacilities{"LOG_NEWS"}     =  7;
+		$LogFacilities{"LOG_SYSLOG"}   =  8;
+		$LogFacilities{"LOG_USER"}     =  9;
+		$LogFacilities{"LOG_UUCP"}     = 10;
+		$LogFacilities{"LOG_LOCAL0"}   = 11;
+		$LogFacilities{"LOG_LOCAL1"}   = 12;
+		$LogFacilities{"LOG_LOCAL2"}   = 13;
+		$LogFacilities{"LOG_LOCAL3"}   = 14;
+		$LogFacilities{"LOG_LOCAL4"}   = 15;
+		$LogFacilities{"LOG_LOCAL5"}   = 16;
+		$LogFacilities{"LOG_LOCAL6"}   = 17;
+		$LogFacilities{"LOG_LOCAL7"}   = 18;
                 ';
 	}
 else
 	{
 	eval   'use Unix::Syslog;
 	        $OpenLog  = sub {
-				Unix::Syslog::openlog($_[0], $_[1], $_[2]);
+	        		my $Ident = $_[0];
+				Unix::Syslog::openlog($Ident, $_[1], $_[2]);
                 		return 1;
                 		};
                 $CloseLog = sub { Unix::Syslog::closelog; };
-                $PutMsg   = sub {
-                		my ($Self, $Level, $Str) = @_;
-				$Str =~ s/%/%%/g;
-			        Unix::Syslog::syslog($Level, "$Str\n");
-				};
+                $PutMsg   = sub { Unix::Syslog::syslog($_[1], "%s", $_[2]); };
 		# Set real log levels
 		$LogLevels[LOG_EMERG]   = Unix::Syslog::LOG_EMERG;
 		$LogLevels[LOG_ALERT]   = Unix::Syslog::LOG_ALERT;
@@ -151,7 +151,7 @@ else
 		$LogOptions{"LOG_NDELAY"} = Unix::Syslog::LOG_NDELAY;
 		$LogOptions{"LOG_PID"}    = Unix::Syslog::LOG_PID;
 		#
-		# Set log facilites
+		# Set log facilities
 		$LogFacilities{"LOG_AUTH"}     = Unix::Syslog::LOG_AUTH;
 		$LogFacilities{"LOG_CRON"}     = Unix::Syslog::LOG_CRON;
 		$LogFacilities{"LOG_DAEMON"}   = Unix::Syslog::LOG_DAEMON;
@@ -172,7 +172,7 @@ else
 		$LogFacilities{"LOG_LOCAL7"}   = Unix::Syslog::LOG_LOCAL7;
                 ';
 	};
-if ($@) { die $@; };
+if ($@) { croak $@; };
 
 my %LogParam = (Ident    => $0,
                 Level    => 6,
@@ -182,54 +182,96 @@ my %LogParam = (Ident    => $0,
 
 # Preloaded methods go here.
 
-sub new
+my $CleanStr = sub($)
 	{
-	my ($class, %PARAMHASH) = @_;
+	if (!defined($_[0])) { return; };
+	my %BadChars = ("\x00" => "\\x00", "\x01" => "\\x01", "\x02" => "\\x02", "\x03" => "\\x03",
+	                "\x04" => "\\x04", "\x05" => "\\x05", "\x06" => "\\x06", "\a"   => "\\a",
+	                "\b"   => "\\b",   "\t"   => "\\t",   "\n"   => "\\n",   "\x0b" => "\\x0b",
+	                "\f"   => "\\f",   "\r"   => "\\r",   "\x0e" => "\\x0e", "\x0f" => "\\x0f",
+	                "\x10" => "\\x10", "\x11" => "\\x11", "\x12" => "\\x12", "\x13" => "\\x13",
+	                "\x14" => "\\x14", "\x15" => "\\x15", "\x16" => "\\x16", "\x17" => "\\x17",
+	                "\x18" => "\\x18", "\x19" => "\\x19", "\x1a" => "\\x1a", "\e"   => "\\e",    
+	                "\x1c" => "\\x1c", "\x1d" => "\\x1d", "\x1e" => "\\x1e", "\x1f" => "\\x1f",
+	                "\xff" => "\\xff",
+	               );
+	my $Str = $_[0];
+	$Str =~ s/\A[\s\n]+//gm;
+	$Str =~ s/[\s\n]+\Z//gm;
+	$Str =~ s{ ( [\x00-\x1f\xff] ) } { $BadChars{"$1"} }gmex;
+	return $Str;
+	};
+
+sub new($%)
+	{
+	my ($class, %LogParam) = @_;
 
 	my $Logger = undef;
 	
-	foreach (keys(%PARAMHASH))
-		{ $LogParam{$_} = $PARAMHASH{$_}; };
+	$LogParam{Ident} = &{$CleanStr}($LogParam{Ident});
 
 	my $Handler = &$OpenLog($LogParam{Ident}, $LogParam{Options}, $LogParam{Facility})
-		or die "Can nor create log handler!\n";
+		or croak "Can nor create log handler!\n";
 
 	return bless {Ident    => $LogParam{Ident},
 		      Level    => $LogParam{Level},
+		      Facility => $LogParam{Facility},
 		      StdErr   => $LogParam{StdErr},
                       Handler  => $Handler} => $class;
 	};
 
-sub Message
+sub Message($$$@)
 	{
-	my ($Self, $Level, $Str) = @_;
+	my ($Self, $Level, $Format, @Args) = @_;
 
-	if ($Level < 0) { $Level = 0; };
-	if ($Level > 7) { $Level = 7; };
+	if (!$_[0]->{Handler})
+		{
+		carp "Logger is closed!\n";
+		return;
+		};
+
+	if    ($Level < 0)
+		{
+                if ($^W) { carp "Log level \"$Level\" adjusted from \"$Level\" to \"0\"\n"; };
+		$Level = 0;
+		}
+	elsif ($Level > 7)
+		{
+                if ($^W) { carp "Log level \"$Level\" adjusted from \"$Level\" to \"7\"\n"; };
+		$Level = 7;
+		};
 
 	if ($Level <= $Self->{Level})
 		{
-		$Str =~ s/\A\s+//;
-		$Str =~ s/\s+\Z//;
-		chomp($Str);
-		$Str =~ s/\s+/ /g;
-		$Str =~ s/\n/"; "/g;
+		my $Str = &{$CleanStr}(sprintf($Format, @Args));
+
 		if ($Self->{StdErr})
-			{ print STDERR localtime()." $Level\t\"$Str\"\n"; };
+			{ print STDERR localtime()." $Level\t$Str\n"; };
+
 	        &$PutMsg($Self, $LogLevels[$Level], $Str);
 		};
 	};
 
-sub Level
+sub Level($$)
 	{
+	if (!$_[0]->{Handler})
+		{
+		carp "Logger is closed!\n";
+		return;
+		};
 	my $Return = $_[0]->{Level};
 	if (defined($_[1]))
 		{ $_[0]->{Level} = $_[1]; };
 	return $Return;
 	};
 
-sub StdErr
+sub StdErr($$)
 	{
+	if (!$_[0]->{Handler})
+		{
+		carp "Logger is closed!\n";
+		return;
+		};
 	my $Return = $_[0]->{StdErr};
 	if (defined($_[1]))
 		{ $_[0]->{StdErr} = $_[1]; };
@@ -238,9 +280,13 @@ sub StdErr
 
 sub Close($)
 	{
-	my ($Self) = @_;
-	&$CloseLog($Self);
-	$Self->{Handler} = 0;
+	if (!$_[0]->{Handler})
+		{
+		carp "Logger is closed!\n";
+		return;
+		};
+	&{$CloseLog}($_[0]);
+	$_[0]->{Handler} = 0;
 	};
 
 1;
@@ -254,7 +300,7 @@ UniLog - Perl module for unified logging on Unix and Win32
 =head1 SYNOPSIS
 
   use UniLog qw(:levels);
-  use UniLog qw(:options :facilites); # Not useful on Win32
+  use UniLog qw(:options :facilities); # Not useful on Win32
 
   $Logger=UniLog->new(Ident    => "MyProgram",
                                   # The log source identification
@@ -267,7 +313,7 @@ UniLog - Perl module for unified logging on Unix and Win32
                       StdErr   => 1);
                                   # Log messages also to STDERR
 
-  $Logger->Message(LOG_NOTICE, "Message text here");
+  $Logger->Message(LOG_NOTICE, "Message text here, time: %d", time());
            # Send message to the log
 
   $Logger->Message(LOG_DEBUG, "You should not see this");
@@ -370,10 +416,13 @@ Default is 0 - do not log to C<STDERR>.
 
 =back
 
-=item C<Message($Level, $MessageStr);>
+=item C<Message($Level, $Format, @SprintfParams);>
 
-The C<Message> method send a I<$MessageStr> to the syslog or EventLog 
+The C<Message> method send a log string to the syslog or EventLog 
 and, if allowed, to C<STDERR>.
+Log string will be formed by sprintf function from I<$Format> format string and
+parameters passed in I<@SprintfParams>. Of course, I<@SprintfParams> could be empty
+if no parameters required by format string.
 
 The I<$Level> should be an integer and could be:
 
@@ -431,17 +480,6 @@ See L<Unix::Syslog>(3) for "C<LOG_*>" description,
 see L<Win32::EventLog>(3) for "C<EVENTLOG_*_TYPE>" descriptions.
 
 =back
-
-I<$MessageStr> is a string which will be sended to syslog/EventLog and, if allowed,
-printed to STDERR.
-
-Following substitutions will be made for I<$MessageStr>:
-
-  $MessageStr =~ s/\A\s+//;
-  $MessageStr =~ s/\s+\Z//;
-  chomp($MessageStr);
-  $MessageStr =~ s/\s+/ /g;
-  $MessageStr =~ s/\n/"; "/g;
 
 =item C<Level([$LogLevel]);>
 

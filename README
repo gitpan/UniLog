@@ -1,4 +1,4 @@
-UniLog version 0.03
+UniLog version 0.04
 ===================
 
 This module could be used for hide some annoing operations
@@ -25,6 +25,7 @@ DEPENDENCIES
 
 This module requires these other modules:
 
+    Carp
     Unix::Syslog - on Unix systems
     Win32::EventLog from libwin32 - on Win32 systems
 
