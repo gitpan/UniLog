@@ -1,5 +1,10 @@
 Revision history for Perl extension UniLog.
 
+0.12  Thu Nov 11 18:30:00 2004
+	- Methods
+	  emergency(), alert(), critical(), error(), warning(), notice(), info(), debug()
+	  added
+
 0.11  Fri Mar 07 22:20:00 2003
 	- Licence changed
 

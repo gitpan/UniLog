@@ -35,7 +35,7 @@ $EXPORT_TAGS{'all'}
 
 @EXPORT_FAIL = qw(syslog nosyslog);	# hook to enable/disable syslog
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 
 use Carp qw(carp croak cluck confess);
 use POSIX;
@@ -351,6 +351,27 @@ sub new($%)
 	return bless $self => $class;
 	};
 
+sub error($$@)
+	{ return Message(shift, LOG_ERR(), @_); }; 
+
+
+sub emergency($$@)
+	{ return Message(shift, LOG_EMERG(),   @_); };
+sub alert($$@)
+	{ return Message(shift, LOG_ALERT(),   @_); };
+sub critical($$@)
+	{ return Message(shift, LOG_CRIT(),    @_); };
+sub error($$@)
+	{ return Message(shift, LOG_ERR(),     @_); };
+sub warning($$@)
+	{ return Message(shift, LOG_WARNING(), @_); };
+sub notice($$@)
+	{ return Message(shift, LOG_NOTICE(),  @_); };
+sub info($$@)
+	{ return Message(shift, LOG_INFO(),    @_); };
+sub debug($$@)
+	{ return Message(shift, LOG_DEBUG(),   @_); };
+
 sub Message($$$@)
 	{
 	my ($self, $Level, $Format, @Args) = @_;
@@ -478,7 +499,7 @@ __END__
 
 UniLog - Perl module for unified logging on Unix and Win32
 
-I<Version 0.11>
+I<Version 0.12>
 
 =head1 SYNOPSIS
 
@@ -728,6 +749,39 @@ see L<Win32::EventLog>(3) for "C<EVENTLOG_*_TYPE>" descriptions.
 
 In case of fatal error C<Message()> returns I<C<undef>>. I<C<$!>> variable will contain the error message. 
 
+=item C<emergency($Format, @SprintfParams);>
+
+Just a synonym for I<C<Message(LOG_EMERG, $Format, @SprintfParams)>>
+
+=item C<alert($Format, @SprintfParams);>
+
+Just a synonym for I<C<Message(LOG_ALERT, $Format, @SprintfParams)>>
+
+=item C<critical($Format, @SprintfParams);>
+
+Just a synonym for I<C<Message(LOG_CRIT, $Format, @SprintfParams)>>
+
+=item C<error($Format, @SprintfParams);>
+
+Just a synonym for I<C<Message(LOG_ERR, $Format, @SprintfParams)>>
+
+=item C<warning($Format, @SprintfParams);>
+
+Just a synonym for I<C<Message(LOG_WARNING, $Format, @SprintfParams)>>
+
+=item C<notice($Format, @SprintfParams);>
+
+Just a synonym for I<C<Message(LOG_NOTICE, $Format, @SprintfParams)>>
+
+=item C<info($Format, @SprintfParams);>
+
+Just a synonym for I<C<Message(LOG_INFO, $Format, @SprintfParams)>>
+
+=item C<debug($Format, @SprintfParams);>
+
+Just a synonym for I<C<Message(LOG_DEBUG, $Format, @SprintfParams)>>
+
+    
 =item C<Level([$LogLevel]);>
 
 If I<$LogLevel> is not specified C<Level> returns a current log level.
