@@ -8,6 +8,8 @@
 use Test;
 BEGIN { plan tests => 2 };
 
+$^W++;
+
 use UniLog qw(:levels :options :facilities);
 ok(1); # If we made it this far, we're ok.
 

@@ -29,9 +29,9 @@ require Exporter;
 				    LOG_LOCAL0 LOG_LOCAL1 LOG_LOCAL2 LOG_LOCAL3
 				    LOG_LOCAL4 LOG_LOCAL5 LOG_LOCAL6 LOG_LOCAL7)]);
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 
-use Carp;
+use Carp qw(carp croak cluck confess);
 
 my @LogLevels     = ();
 my %LogOptions    = ();
@@ -80,51 +80,72 @@ my $PutMsg   = undef;
 
 if ( "\L$^O" =~ m/win32/ )
 	{
-	eval   'use Win32::EventLog;
-	        $OpenLog  = sub { return Win32::EventLog->new($_[0], $ENV{ComputerName}); };
-                $CloseLog = sub { $_[0]->{Handler}->Close(); };
-                $PutMsg   = sub { $_[0]->{Handler}->Report({EventType => $_[1],
-                					    Strings   => $_[2],
-                					    Category  => $_[0]->{Facility},
-                					    EventID   => 0,
-                					    Data      => "",
-                					   }
-                					  );
-				};
-		$LogLevels[LOG_EMERG]   = EVENTLOG_ERROR_TYPE;
-		$LogLevels[LOG_ALERT]   = EVENTLOG_ERROR_TYPE;
-		$LogLevels[LOG_CRIT]    = EVENTLOG_ERROR_TYPE;
-		$LogLevels[LOG_ERR]     = EVENTLOG_ERROR_TYPE;
-		$LogLevels[LOG_WARNING] = EVENTLOG_WARNING_TYPE;
-		$LogLevels[LOG_NOTICE]  = EVENTLOG_INFORMATION_TYPE;
-		$LogLevels[LOG_INFO]    = EVENTLOG_INFORMATION_TYPE;
-		$LogLevels[LOG_DEBUG]   = EVENTLOG_INFORMATION_TYPE;
+	if (Win32::IsWinNT())
+		{
+		eval   'use Win32::EventLog;
+		        $OpenLog  = sub { return Win32::EventLog->new($_[0], $ENV{ComputerName}); };
+	                $CloseLog = sub { $_[0]->{Handler}->Close(); };
+	                $PutMsg   = sub { $_[0]->{Handler}->Report({EventType => $_[1],
+	                					    Strings   => $_[2],
+	                					    Category  => $_[0]->{Facility},
+	                					    EventID   => 0,
+	                					    Data      => "",
+	                					   }
+	                					  );
+					};
+			$LogLevels[LOG_EMERG]   = EVENTLOG_ERROR_TYPE;
+			$LogLevels[LOG_ALERT]   = EVENTLOG_ERROR_TYPE;
+			$LogLevels[LOG_CRIT]    = EVENTLOG_ERROR_TYPE;
+			$LogLevels[LOG_ERR]     = EVENTLOG_ERROR_TYPE;
+			$LogLevels[LOG_WARNING] = EVENTLOG_WARNING_TYPE;
+			$LogLevels[LOG_NOTICE]  = EVENTLOG_INFORMATION_TYPE;
+			$LogLevels[LOG_INFO]    = EVENTLOG_INFORMATION_TYPE;
+			$LogLevels[LOG_DEBUG]   = EVENTLOG_INFORMATION_TYPE;
+	                ';
+		}
+	else
+	
+		{
+		if ($^W) { carp "The Win32::Eventlog module works only on Windows NT, so only STDERR functionality will be provided\n"; };
 		#
-		# Set log options
-		$LogOptions{"LOG_CONS"}   = 0;
-		$LogOptions{"LOG_NDELAY"} = 0;
-		$LogOptions{"LOG_PID"}    = 0;
+		$OpenLog  = sub { return 1; };
+	        $CloseLog = sub { return; };
+	        $PutMsg   = sub { $_[0]->{StdErr} = 1; };
 		#
-		# Set log facilities
-		$LogFacilities{"LOG_AUTH"}     =  1;
-		$LogFacilities{"LOG_CRON"}     =  2;
-		$LogFacilities{"LOG_DAEMON"}   =  3;
-		$LogFacilities{"LOG_KERN"}     =  4;
-		$LogFacilities{"LOG_LPR"}      =  5;
-		$LogFacilities{"LOG_MAIL"}     =  6;
-		$LogFacilities{"LOG_NEWS"}     =  7;
-		$LogFacilities{"LOG_SYSLOG"}   =  8;
-		$LogFacilities{"LOG_USER"}     =  9;
-		$LogFacilities{"LOG_UUCP"}     = 10;
-		$LogFacilities{"LOG_LOCAL0"}   = 11;
-		$LogFacilities{"LOG_LOCAL1"}   = 12;
-		$LogFacilities{"LOG_LOCAL2"}   = 13;
-		$LogFacilities{"LOG_LOCAL3"}   = 14;
-		$LogFacilities{"LOG_LOCAL4"}   = 15;
-		$LogFacilities{"LOG_LOCAL5"}   = 16;
-		$LogFacilities{"LOG_LOCAL6"}   = 17;
-		$LogFacilities{"LOG_LOCAL7"}   = 18;
-                ';
+		$LogLevels[LOG_EMERG]   = 0;
+		$LogLevels[LOG_ALERT]   = 0;
+		$LogLevels[LOG_CRIT]    = 0;
+		$LogLevels[LOG_ERR]     = 0;
+		$LogLevels[LOG_WARNING] = 0;
+		$LogLevels[LOG_NOTICE]  = 0;
+		$LogLevels[LOG_INFO]    = 0;
+		$LogLevels[LOG_DEBUG]   = 0;
+		};
+	#
+	# Set log options
+	$LogOptions{"LOG_CONS"}   = 0;
+	$LogOptions{"LOG_NDELAY"} = 0;
+	$LogOptions{"LOG_PID"}    = 0;
+	#
+	# Set log facilities
+	$LogFacilities{"LOG_AUTH"}     =  1;
+	$LogFacilities{"LOG_CRON"}     =  2;
+	$LogFacilities{"LOG_DAEMON"}   =  3;
+	$LogFacilities{"LOG_KERN"}     =  4;
+	$LogFacilities{"LOG_LPR"}      =  5;
+	$LogFacilities{"LOG_MAIL"}     =  6;
+	$LogFacilities{"LOG_NEWS"}     =  7;
+	$LogFacilities{"LOG_SYSLOG"}   =  8;
+	$LogFacilities{"LOG_USER"}     =  9;
+	$LogFacilities{"LOG_UUCP"}     = 10;
+	$LogFacilities{"LOG_LOCAL0"}   = 11;
+	$LogFacilities{"LOG_LOCAL1"}   = 12;
+	$LogFacilities{"LOG_LOCAL2"}   = 13;
+	$LogFacilities{"LOG_LOCAL3"}   = 14;
+	$LogFacilities{"LOG_LOCAL4"}   = 15;
+	$LogFacilities{"LOG_LOCAL5"}   = 16;
+	$LogFacilities{"LOG_LOCAL6"}   = 17;
+	$LogFacilities{"LOG_LOCAL7"}   = 18;
 	}
 else
 	{
@@ -211,7 +232,7 @@ sub new($%)
 	$LogParam{Ident} = &{$CleanStr}($LogParam{Ident});
 
 	my $Handler = &$OpenLog($LogParam{Ident}, $LogParam{Options}, $LogParam{Facility})
-		or croak "Can nor create log handler!\n";
+		or confess "Can nor create log handler!\n";
 
 	return bless {Ident    => $LogParam{Ident},
 		      Level    => $LogParam{Level},
@@ -226,18 +247,18 @@ sub Message($$$@)
 
 	if (!$_[0]->{Handler})
 		{
-		carp "Logger is closed!\n";
+		cluck "Logger is closed!\n";
 		return;
 		};
 
 	if    ($Level < 0)
 		{
-                if ($^W) { carp "Log level \"$Level\" adjusted from \"$Level\" to \"0\"\n"; };
+                if ($^W) { cluck "Log level \"$Level\" adjusted from \"$Level\" to \"0\"\n"; };
 		$Level = 0;
 		}
 	elsif ($Level > 7)
 		{
-                if ($^W) { carp "Log level \"$Level\" adjusted from \"$Level\" to \"7\"\n"; };
+                if ($^W) { cluck "Log level \"$Level\" adjusted from \"$Level\" to \"7\"\n"; };
 		$Level = 7;
 		};
 
@@ -245,10 +266,10 @@ sub Message($$$@)
 		{
 		my $Str = &{$CleanStr}(sprintf($Format, @Args));
 
+	        &$PutMsg($Self, $LogLevels[$Level], $Str);
+
 		if ($Self->{StdErr})
 			{ print STDERR localtime()." $Level\t$Str\n"; };
-
-	        &$PutMsg($Self, $LogLevels[$Level], $Str);
 		};
 	};
 
@@ -256,7 +277,7 @@ sub Level($$)
 	{
 	if (!$_[0]->{Handler})
 		{
-		carp "Logger is closed!\n";
+		cluck "Logger is closed!\n";
 		return;
 		};
 	my $Return = $_[0]->{Level};
@@ -269,7 +290,7 @@ sub StdErr($$)
 	{
 	if (!$_[0]->{Handler})
 		{
-		carp "Logger is closed!\n";
+		cluck "Logger is closed!\n";
 		return;
 		};
 	my $Return = $_[0]->{StdErr};
@@ -282,7 +303,7 @@ sub Close($)
 	{
 	if (!$_[0]->{Handler})
 		{
-		carp "Logger is closed!\n";
+		cluck "Logger is closed!\n";
 		return;
 		};
 	&{$CloseLog}($_[0]);
@@ -343,7 +364,7 @@ on Unix and on Win32 without code adjusting and with the same logging functional
 I<Notes:>
 
 I<C<Win32::EventLog> does not support any Win32 platform except WinNT.
-So, C<UniLog> does not support them too.>
+So, C<UniLog> provides only STDERR functionality on these platforms.>
 
 I<Logging to remote server is not supported in this release.>
 

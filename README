@@ -1,4 +1,4 @@
-UniLog version 0.05
+UniLog version 0.06
 ===================
 
 This module could be used for hide some annoing operations
@@ -10,7 +10,7 @@ and trough EventLog on Win32.
 Only local logging supported.
 Logging to remote computer will be supported in a future. Probably.
 
-Module was tested on FreeBSD 4.2, Win2000 and Solaris 7.
+Module was tested on FreeBSD 4.2, Win2000, Win98 and Solaris 7.
 
 INSTALLATION
 

@@ -2,9 +2,16 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
-my $PreReq = {'Unix::Syslog' => 0.01 };
+my $PreReq = {};
+
 if ( "\L$^O" =~ m/win32/ )
-	{ $PreReq = { 'Win32::EventLog' => 0 }; };
+	{
+	if (Win32::IsWinNT())
+		{ $PreReq->{'Win32::EventLog'} = 0; };
+	}
+else
+	{ $PreReq->{'Unix::Syslog'} = 0.01; };
+
 $PreReq->{'Carp'} = 0;
 
 WriteMakefile(
