@@ -1,4 +1,4 @@
-UniLog version 0.09
+UniLog version 0.11
 ===================
 
 This module could be used to hide some annoying operations
@@ -36,7 +36,8 @@ This module requires these other modules:
 
 COPYRIGHT AND LICENCE
 
-No copyright, no licence. Be patient...
+Copyright: Daniel Podolsky <tpaba@cpan.org>, 2003
+Licence:   Same as perl itself
 
 29 Sep 2001, Daniel Podolsky <tpaba@cpan.org>
 

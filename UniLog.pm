@@ -28,17 +28,14 @@ require Exporter;
 		);
 
 foreach (keys(%EXPORT_TAGS))
-	{
-	if ($_ eq 'all')
-		{ next; };
-	push(@{$EXPORT_TAGS{'all'}}, @{$EXPORT_TAGS{$_}});
-	};
+        { push(@{$EXPORT_TAGS{'all'}}, @{$EXPORT_TAGS{$_}}); };
 
-@EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+$EXPORT_TAGS{'all'}
+	and @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 @EXPORT_FAIL = qw(syslog nosyslog);	# hook to enable/disable syslog
 
-$VERSION = '0.09';
+$VERSION = '0.11';
 
 use Carp qw(carp croak cluck confess);
 use POSIX;
@@ -155,7 +152,7 @@ my $InitSyslog = sub
 		        	{
 		        	$_[0]->{Handler}->Close();
 		        	};
-		        $PutMsg   = sub
+		        $PutMsg = sub
 		        	{ $_[0]->{Handler}->Report({EventType => $_[1],
 		        				    Strings   => $_[2],
 		        				    Category  => $_[0]->{"Facility"},
@@ -481,7 +478,7 @@ __END__
 
 UniLog - Perl module for unified logging on Unix and Win32
 
-I<Version 0.09>
+I<Version 0.11>
 
 =head1 SYNOPSIS
 
