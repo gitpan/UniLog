@@ -1,5 +1,9 @@
 Revision history for Perl extension UniLog.
 
+0.14  Mon Jan 10 17:00:00 2005
+	- 'SafeStr' parameter added to 'new()'
+	- Information about Perl2Exe problem update
+
 0.13  Wed Nov 24 15:00:00 2004
     - 'Subroutine error redefined at PERL2EXE_STORAGE/UniLog.pm line 365.' error fixed
 

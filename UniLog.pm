@@ -35,7 +35,7 @@ $EXPORT_TAGS{'all'}
 
 @EXPORT_FAIL = qw(syslog nosyslog);	# hook to enable/disable syslog
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 use Carp qw(carp croak cluck confess);
 use POSIX;
@@ -300,6 +300,7 @@ sub new($%)
 	                'Truncate'  => 0,
 	                'Options'   => LOG_PID() | LOG_CONS(),
 	                'Facility'  => LOG_USER(),
+	                'SafeStr'   => 1,
 	                );
 
 	foreach (keys(%DefParam))
@@ -314,18 +315,19 @@ sub new($%)
 		$LogParam{'Facility'} = $DefParam{'Facility'};
 		};
 	
-	my $self = {'Ident'    => SafeStr($LogParam{Ident}),
-		    'Level'    => $LogParam{'Level'},
-		    'Facility' => $LogFacilities{$LogParam{'Facility'}},
-		    'StdErr'   => $LogParam{'StdErr'},
-		    'SysLog'   => ($LogParam{'SysLog'} && $SyslogEnabled),
-		    'LogFileNameTemplate' => $LogParam{'LogFile'},
-		    'Truncate'            => $LogParam{'Truncate'},
+	my $self = {'Ident'               => SafeStr($LogParam{Ident}),
+	            'Level'               => $LogParam{'Level'},
+	            'Facility'            => $LogFacilities{$LogParam{'Facility'}},
+	            'StdErr'              => $LogParam{'StdErr'},
+	            'SysLog'              => ($LogParam{'SysLog'} && $SyslogEnabled),
+	            'SafeStr'             => $LogParam{'SafeStr'},
+	            'LogFileNameTemplate' => $LogParam{'LogFile'},
+	            'Truncate'            => $LogParam{'Truncate'},
 	            'DirPerms'            => $LogParam{'DirPerms'},
 	            'FilePerms'           => $LogParam{'FilePerms'},
-		    'LogFileNameCurrent'  => '',
-		    'LogFileHandler'      => undef,
-                   };
+	            'LogFileNameCurrent'  => '',
+	            'LogFileHandler'      => undef,
+         };
 
 	if ($OpenLog)
 		{
@@ -385,7 +387,7 @@ sub Message($$$@)
 
 	if ($Level <= $self->{Level})
 		{
-		my $Str = SafeStr(sprintf($Format, @Args));
+		my $Str = $self->{'SafeStr'} ? SafeStr(sprintf($Format, @Args)) : sprintf($Format, @Args);
 
 		if ($self->{'StdErr'})
 			{ print STDERR localtime()." $Level $Str\n"; };
@@ -495,7 +497,7 @@ __END__
 
 UniLog - Perl module for unified logging on Unix and Win32
 
-I<Version 0.13>
+I<Version 0.14>
 
 =head1 SYNOPSIS
 
@@ -673,6 +675,12 @@ start logging.
 You will be able to change this flag using L<Truncate> method.
 
 Default is 0 - do not truncate file.
+
+=item C<SafeStr>
+
+If 'true' all the 'dangerous' symbols will be printed as their hex codes.
+
+Default is 1 - change dangerous symbols to their hex codes.
 
 =back
 
@@ -896,6 +904,8 @@ UniLog is using external module (Unix::Syslog or Win32::Event) for actual loggin
 The appropriate module is loading during runtime (in C<eval> section) so Perl2Exe
 is not able to determinate this module have to be compiled in. You have to include
 C<"use Unix::Syslog;"> or C<"use Win32::EventLog;"> to your script or disable syslog usage.
+
+Uptate (Jan 10 2005): forget about Perl2Exe, use L<PAR> instead (see bundled L<pp> utility).
 
 =back
 
