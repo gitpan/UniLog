@@ -1,5 +1,8 @@
 Revision history for Perl extension UniLog.
 
+0.09  Fri Jan 24 15:40:00 2003
+	- Minor bug with Win32 log levels fixed
+
 0.07  Wed Jun 21 02:12:00 2002
 	- Support for logging to file added
 	- Posibility to disable syslog modules loading added

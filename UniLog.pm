@@ -38,7 +38,7 @@ foreach (keys(%EXPORT_TAGS))
 
 @EXPORT_FAIL = qw(syslog nosyslog);	# hook to enable/disable syslog
 
-$VERSION = '0.07';
+$VERSION = '0.09';
 
 use Carp qw(carp croak cluck confess);
 use POSIX;
@@ -221,6 +221,12 @@ my $InitSyslog = sub
 			$LogFacilities{LOG_LOCAL7()}   = Unix::Syslog::LOG_LOCAL7;
 	                ';
 		};
+	
+	# These linea are necessary!
+	foreach (@LogLevels)           { my $tmpVar = $_; };
+	foreach (keys(%LogOptions))    { my $tmpVar = $_; };
+	foreach (keys(%LogFacilities)) { my $tmpVar = $_; };
+	
 	if ($@) { croak $@; };
 	if ($^W) { carp "Syslog functionality enabled\n"; };
 	my $tmpVar = $OpenLog.$CloseLog.$PutMsg; # This string is necessary.
@@ -371,7 +377,7 @@ sub Message($$$@)
 			{ print STDERR localtime()." $Level $Str\n"; };
 
 		if ($PutMsg)
-			{ &$PutMsg($self, $LogLevels[$Level], $Str); };
+			{ &{$PutMsg}($self, $LogLevels[$Level], $Str); };
 
 		if (defined($self->{'LogFileNameTemplate'}))
 			{
@@ -475,7 +481,7 @@ __END__
 
 UniLog - Perl module for unified logging on Unix and Win32
 
-I<Version 0.07>
+I<Version 0.09>
 
 =head1 SYNOPSIS
 
