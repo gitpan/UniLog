@@ -1,15 +1,16 @@
-UniLog version 0.01
+UniLog version 0.02
 ===================
 
 This module could be used for hide some annoing operations
 with logging on Unix and Win32 systems.
 
 Your messages will be logged trough syslog on Unix
-and trough EventLog on Win32 (if available)
+and trough EventLog on Win32.
 
 Only local logging supported.
-Logging to remote computer will be supported in a future.
-Probably.
+Logging to remote computer will be supported in a future. Probably.
+
+Module was tested on FreeBSD 4.2, Win2000 and Solaris 7.
 
 INSTALLATION
 
@@ -32,5 +33,5 @@ COPYRIGHT AND LICENCE
 
 No copyright, no licence. Be patient...
 
-29 Sep 2001, Daniel Podolsky <nil@lek.ru>
+29 Sep 2001, Daniel Podolsky <tpaba@cpan.org>
 

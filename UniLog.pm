@@ -29,7 +29,7 @@ require Exporter;
 				    LOG_LOCAL0 LOG_LOCAL1 LOG_LOCAL2 LOG_LOCAL3
 				    LOG_LOCAL4 LOG_LOCAL5 LOG_LOCAL6 LOG_LOCAL7)]);
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 my @LogLevels     = ();
 my %LogOptions    = ();
@@ -273,6 +273,8 @@ So, C<UniLog> does not support them too.>
 
 I<Logging to remote server is not supported in this release.>
 
+Module was tested on FreeBSD 4.2, Win2000 and Solaris 7.
+
 =head1 The UniLog methods
 
 =over 4
@@ -437,7 +439,7 @@ None by default.
 
 =head1 AUTHOR
 
-Daniel Podolsky, E<lt>tpaba@mail.comE<gt>
+Daniel Podolsky, E<lt>tpaba@cpan.orgE<gt>
 
 =head1 SEE ALSO
 
