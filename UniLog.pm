@@ -29,7 +29,7 @@ require Exporter;
 				    LOG_LOCAL0 LOG_LOCAL1 LOG_LOCAL2 LOG_LOCAL3
 				    LOG_LOCAL4 LOG_LOCAL5 LOG_LOCAL6 LOG_LOCAL7)]);
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 use Carp;
 
@@ -332,12 +332,12 @@ UniLog - Perl module for unified logging on Unix and Win32
 
 =head1 DESCRIPTION
 
-This module provides an unified way to send log messages on Unix and Win32.
+This module provides a unified way to send log messages on Unix and Win32.
 Messages are logged using syslog on Unix and using EventLog on Win32.
 
 This module uses L<Unix::Syslog> Perl module on Unix and L<Win32::EventLog> Perl module on Win32.
 
-The idea was to give a programmer a posibility to write a program which will be able to run
+The idea was to give a programmer a possibility to write a program which will be able to run
 on Unix and on Win32 without code adjusting and with the same logging functionality.
 
 I<Notes:>
@@ -400,7 +400,7 @@ This field is ignored on Win32.
 =item C<Level>
 
 This is an integer value which specifies log level.
-All messages with Level greater than C<Level> will not be logged.
+The message with Level greater than C<Level> will not be logged.
 You will be able to change Level using C<Level> method.
 See C<Message> method description for available log levels.
 
@@ -420,9 +420,9 @@ Default is 0 - do not log to C<STDERR>.
 
 The C<Message> method send a log string to the syslog or EventLog 
 and, if allowed, to C<STDERR>.
-Log string will be formed by sprintf function from I<$Format> format string and
+Log string will be formed by C<sprintf> function from I<$Format> format string and
 parameters passed in I<@SprintfParams>. Of course, I<@SprintfParams> could be empty
-if no parameters required by format string.
+if no parameters required by format string. See C<sprintf> in C<perlfunc> for details.
 
 The I<$Level> should be an integer and could be:
 
@@ -502,6 +502,19 @@ Close the logger.
 =head2 EXPORT
 
 None by default.
+
+=head1 Known problems
+
+=over 4
+
+=item Problem with Perl2Exe utility.
+
+UniLog is using external module (Unix::Syslog or Win32::Event) for actual logging.
+The appropriate module is loading during runtime (in C<eval> section) so Perl2Exe
+is not able to determinate this module have to be compiled in. You have to include
+C<"use Unix::Syslog;"> or C<"use Win32::EventLog;"> to your script.
+
+=back
 
 =head1 AUTHOR
 

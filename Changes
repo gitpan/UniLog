@@ -1,5 +1,10 @@
 Revision history for Perl extension UniLog.
 
+0.05  Wed Apr 24 17:00:00 2002
+	- The pre-request for apropriate module (Unix::Syslog or Win32::EventLog)
+	  added to Makefile.PL by request from CPAN tester
+	- Information about Perl2Exe problem added to documentation, section "Known problems"
+
 0.04  Mon Apr 22 10:25:00 2002
         - Message method was changed to obtain sprintf parameters array
           instead of simple string
