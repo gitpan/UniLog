@@ -1,5 +1,11 @@
 Revision history for Perl extension UniLog.
 
+0.03  Fri Mar 22 18:05:00 2002
+        - Win32 bugfixes.
+        Now it does not produce annoing messages 
+        about "Use of uninitialized value in subroutine entry at EventLog.pm line 199"
+        or "Use undefined value"
+
 0.02  Wed Oct 10 14:30:00 2001
 	- Author e-mail address changed to tpaba@cpan.org
 

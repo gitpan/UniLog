@@ -29,7 +29,7 @@ require Exporter;
 				    LOG_LOCAL0 LOG_LOCAL1 LOG_LOCAL2 LOG_LOCAL3
 				    LOG_LOCAL4 LOG_LOCAL5 LOG_LOCAL6 LOG_LOCAL7)]);
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 my @LogLevels     = ();
 my %LogOptions    = ();
@@ -79,11 +79,14 @@ my $PutMsg   = undef;
 if ( "\L$^O" =~ m/win32/ )
 	{
 	eval   'use Win32::EventLog;
-	        $OpenLog  = sub { return Win32::EventLog->new($_[0]); };
+	        $OpenLog  = sub { return Win32::EventLog->new($_[0], $ENV{ComputerName}); };
                 $CloseLog = sub { $_[0]->{Handler}->Close(); };
-                $PutMsg   = sub {
-                		$_[0]->{Handler}->Report({EventType => $_[1],
-                					  Strings   => $_[2]});
+                $PutMsg   = sub { $_[0]->{Handler}->Report({EventType => $_[1],
+                					    Strings   => $_[2],
+                					    Category  => 0,
+                					    EventID   => 0,
+                					    Data      => ""
+                					  });
 				};
 		$LogLevels[LOG_EMERG]   = EVENTLOG_ERROR_TYPE;
 		$LogLevels[LOG_ALERT]   = EVENTLOG_ERROR_TYPE;
@@ -93,6 +96,31 @@ if ( "\L$^O" =~ m/win32/ )
 		$LogLevels[LOG_NOTICE]  = EVENTLOG_INFORMATION_TYPE;
 		$LogLevels[LOG_INFO]    = EVENTLOG_INFORMATION_TYPE;
 		$LogLevels[LOG_DEBUG]   = EVENTLOG_INFORMATION_TYPE;
+		#
+		# Set log options
+		$LogOptions{"LOG_CONS"}   = 0;
+		$LogOptions{"LOG_NDELAY"} = 0;
+		$LogOptions{"LOG_PID"}    = 0;
+		#
+		# Set log facilites
+		$LogFacilities{"LOG_AUTH"}     = 0;
+		$LogFacilities{"LOG_CRON"}     = 0;
+		$LogFacilities{"LOG_DAEMON"}   = 0;
+		$LogFacilities{"LOG_KERN"}     = 0;
+		$LogFacilities{"LOG_LPR"}      = 0;
+		$LogFacilities{"LOG_MAIL"}     = 0;
+		$LogFacilities{"LOG_NEWS"}     = 0;
+		$LogFacilities{"LOG_SYSLOG"}   = 0;
+		$LogFacilities{"LOG_USER"}     = 0;
+		$LogFacilities{"LOG_UUCP"}     = 0;
+		$LogFacilities{"LOG_LOCAL0"}   = 0;
+		$LogFacilities{"LOG_LOCAL1"}   = 0;
+		$LogFacilities{"LOG_LOCAL2"}   = 0;
+		$LogFacilities{"LOG_LOCAL3"}   = 0;
+		$LogFacilities{"LOG_LOCAL4"}   = 0;
+		$LogFacilities{"LOG_LOCAL5"}   = 0;
+		$LogFacilities{"LOG_LOCAL6"}   = 0;
+		$LogFacilities{"LOG_LOCAL7"}   = 0;
                 ';
 	}
 else
