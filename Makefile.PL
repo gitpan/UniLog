@@ -12,7 +12,11 @@ if ( "\L$^O" =~ m/win32/ )
 else
 	{ $PreReq->{'Unix::Syslog'} = 0.01; };
 
-$PreReq->{'Carp'} = 0;
+$PreReq->{'Carp'}           = 0;
+$PreReq->{'IO::File'}       = 0;
+$PreReq->{'POSIX'}          = 0;
+$PreReq->{'File::Path'}     = 0;
+$PreReq->{'File::Basename'} = 0;
 
 WriteMakefile(
     'NAME'		=> 'UniLog',

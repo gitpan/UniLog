@@ -8,9 +8,11 @@
 use Test;
 BEGIN { plan tests => 2 };
 
-$^W++;
+#$^W++;
 
-use UniLog qw(:levels :options :facilities);
+use UniLog qw(:levels syslog);
+use UniLog qw(:options :facilities); # Not useful on Win32
+#use UniLog qw(:levels :options :facilities);
 ok(1); # If we made it this far, we're ok.
 
 #########################
@@ -28,12 +30,17 @@ my $Logger=UniLog->new(Ident    => 'UniLog test script',
                                    # The log level                       
                        StdErr   => 1,
                                    # Log messages also to STDERR
+                       LogFile  => $0.'.log',
                       );
 
-$Logger->Message(LOG_INFO, "The test message. You have to see it on your console (STDERR) and in your system log (syslog or EventLog)");
+$Logger->Message(LOG_INFO, "The test message.");
+$Logger->Message(LOG_INFO, "You have to see it on your console (STDERR),");
+$Logger->Message(LOG_INFO, "You have to see it in the file \"%s\"", $Logger->LogFile());
+if ($Logger->SysLog())
+	{ $Logger->Message(LOG_INFO, "You have to see it in your system log (syslog or EventLog)"); };
 
 $Logger->Close;
 
-print "If you do not see \"The test messsage...\" UniLog is not working on your computer. Please inform tpaba\@cpan.org\n";
+print "\n\nIf you do not see \"The test messsage...\" UniLog is not working for you.\nIn this case please inform tpaba\@cpan.org\n";
 
 ok(2);

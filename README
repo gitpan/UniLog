@@ -1,7 +1,7 @@
-UniLog version 0.06
+UniLog version 0.07
 ===================
 
-This module could be used for hide some annoing operations
+This module could be used to hide some annoying operations
 with logging on Unix and Win32 systems.
 
 Your messages will be logged trough syslog on Unix
@@ -26,6 +26,10 @@ DEPENDENCIES
 This module requires these other modules:
 
     Carp
+    IO::File
+    File::Path
+    File::Basename
+    POSIX
     Unix::Syslog - on Unix systems
     Win32::EventLog from libwin32 - on Win32 systems
 
