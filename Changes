@@ -1,5 +1,8 @@
 Revision history for Perl extension UniLog.
 
+0.13  Wed Nov 24 15:00:00 2004
+    - 'Subroutine error redefined at PERL2EXE_STORAGE/UniLog.pm line 365.' error fixed
+
 0.12  Thu Nov 11 18:30:00 2004
 	- Methods
 	  emergency(), alert(), critical(), error(), warning(), notice(), info(), debug()

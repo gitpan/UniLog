@@ -35,7 +35,7 @@ $EXPORT_TAGS{'all'}
 
 @EXPORT_FAIL = qw(syslog nosyslog);	# hook to enable/disable syslog
 
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 use Carp qw(carp croak cluck confess);
 use POSIX;
@@ -351,10 +351,6 @@ sub new($%)
 	return bless $self => $class;
 	};
 
-sub error($$@)
-	{ return Message(shift, LOG_ERR(), @_); }; 
-
-
 sub emergency($$@)
 	{ return Message(shift, LOG_EMERG(),   @_); };
 sub alert($$@)
@@ -499,7 +495,7 @@ __END__
 
 UniLog - Perl module for unified logging on Unix and Win32
 
-I<Version 0.12>
+I<Version 0.13>
 
 =head1 SYNOPSIS
 
